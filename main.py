@@ -41,7 +41,7 @@ def parse(f):
 		print()
 
 def main():
-	with open('main.yml', 'r', encoding='utf-8') as f:
+	with open('conf.yml', 'r', encoding='utf-8') as f:
 		try:
 			parse(f)
 		except Exception as e:
