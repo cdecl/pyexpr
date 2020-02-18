@@ -2,6 +2,7 @@
 import json
 import yaml
 import requests 
+import argparse
 
 def get_query(path, query, execute, match, debug):
 	url = path
@@ -28,24 +29,37 @@ def get_query(path, query, execute, match, debug):
 handler = {}
 handler['http'] = get_query
 
-def parse(f):
+def parse(f, args):
 	conf = yaml.safe_load(f)
 
 	for c in conf["tasks"]:
 		task = c['task']
 		if not task in handler: continue
+
+		if args.verbose:
+			print(c)
 		
 		(ok, debug) = handler[task](c["path"], c["query"], c["execute"], c["match"], c["debug"])
 		print('ok : {}'.format(ok))
 		print('debug : {}'.format(debug))
 		print()
 
-def main():
+def runConfig(args):
 	with open('conf.yml', 'r', encoding='utf-8') as f:
 		try:
-			parse(f)
+			parse(f, args)
 		except Exception as e:
 			print(e)
+
+def usage():
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--verbose', '-v', help="verbose", action='store_true')
+	args = parser.parse_args()
+	return args
+
+def main():
+	args = usage()
+	runConfig(args)
 
 if __name__ == "__main__":
 	main()
