@@ -1,0 +1,76 @@
+
+tasks:
+  - task: http
+    name: etlog-shopping
+    path: http://etlog.inpark.kr:8001/vip/shopping.interpark.com_80/
+    query:
+    execute: |
+      arr = [x['conn'] for x in expr['data']['conns']]
+      pct = round((max(arr) - min(arr)) / min(arr), 2)
+      limit = 7000
+      percent = 0.3
+    match: pct > percent and max(arr) > limit
+    debug: arr, pct
+
+  - task: http
+    name: etlog-m.shop
+    path: http://etlog.inpark.kr:8001/vip/m.shop.interpark.com_80/
+    query:
+    execute: |
+      arr = [x['conn'] for x in expr['data']['conns']]
+      pct = round((max(arr) - min(arr)) / min(arr), 2)
+      limit = 20000
+      percent = 0.3
+    match: pct > percent and max(arr) > limit
+    debug: arr, pct
+
+  - task: http
+    name: etlog-ticket
+    path: http://etlog.inpark.kr:8001/vip/ticket.interpark.com_80/
+    query:
+    execute: |
+      arr = [x['conn'] for x in expr['data']['conns']]
+      pct = round((max(arr) - min(arr)) / min(arr), 2)
+      limit = 80000
+      percent = 0.3
+    match: pct > percent and max(arr) > limit
+    debug: arr, pct
+
+  - task: http
+    name: etlog-mticket
+    path: http://etlog.inpark.kr:8001/vip/mticket.interpark.com_80/
+    query:
+    execute: |
+      arr = [x['conn'] for x in expr['data']['conns']]
+      pct = round((max(arr) - min(arr)) / min(arr), 2)
+      limit = 80000
+      percent = 0.3
+    match: pct > percent and max(arr) > limit
+    debug: arr, pct
+
+  - task: http
+    name: etlog-poticket
+    path: http://etlog.inpark.kr:8001/vip/poticket.interpark.com_80/
+    query:
+    execute: |
+      arr = [x['conn'] for x in expr['data']['conns']]
+      pct = round((max(arr) - min(arr)) / min(arr), 2)
+      limit = 50000
+      percent = 0.3
+    match: pct > percent and max(arr) > limit
+    debug: arr, pct
+
+  - task: http
+    name: etlog-mtour
+    path: http://etlog.inpark.kr:8001/vip/mtour.interpark.com_80/
+    query:
+    execute: |
+      arr = [x['conn'] for x in expr['data']['conns']]
+      pct = round((max(arr) - min(arr)) / min(arr), 2)
+      limit = 10000
+      percent = 0.3
+    match: pct > percent and max(arr) > limit
+    debug: arr, pct
+
+
+    

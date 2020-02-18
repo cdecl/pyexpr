@@ -1,0 +1,6 @@
+etlog-shopping
+etlog-m.shop
+etlog-ticket
+etlog-mticket
+etlog-poticket
+etlog-mtour
