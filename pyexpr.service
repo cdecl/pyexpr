@@ -1,0 +1,16 @@
+# elk-search.service
+[Unit]
+Description=pyexpr
+
+[Service]
+WorkingDirectory=/root/service/pyexpr
+ExecStart=/root/service/pyexpr/venv/bin/gunicorn -b :8005 --threads=8 --workers=16 --reload --chdir /root/service/pyexpr index:app
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+SyslogIdentifier=pyexpr
+User=root
+
+[Install]
+WantedBy=multi-user.target
+

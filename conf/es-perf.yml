@@ -1,0 +1,87 @@
+
+tasks:
+  - task: passhttp
+    name: for debug
+    path: http://172.27.1.41:7200/shop-book*/_search
+    query: 
+      size: 5
+      query:
+        match_all: {}
+      #  query_string:
+      #    query: interpark
+    execute: 
+    match: 
+    debug: 
+
+  - task: http
+    name: ent-perf-hostname
+    path: http://172.27.1.41:7200/_sql
+    query: 
+      query: |
+        select HostsName
+        from "entperf*" 
+        where HostsName is not null 
+        and "@timestamp" > now() - interval 10 minute 
+        group by HostsName  
+    execute: |
+      hosts = [ e[0] for e in expr['rows'] ]
+      lens = 111
+    match: len(hosts) < lens 
+    debug: lens, len(hosts), ",".join(hosts)
+
+
+  - task: http
+    name: shop-book-perf-hostname 
+    path: http://172.27.1.41:7200/_sql
+    query: 
+      query: |
+        select hostname
+        from "shop-book-perf*" 
+        where hostname is not null 
+        and "@timestamp" > now() - interval 10 minute 
+        group by hostname  
+    execute: |
+      hosts = [ e[0] for e in expr['rows'] ]
+      lens = 73
+    match: len(hosts) < lens 
+    debug: lens, len(hosts), ",".join(hosts)
+
+
+  - task: http
+    name: mysql-perf-hostname 
+    path: http://172.27.1.41:7200/_sql
+    query: 
+      query: |
+        select hostname
+        from "mysql-perf*" 
+        where hostname is not null 
+        and "@timestamp" > now() - interval 10 minute 
+        group by hostname  
+    execute: |
+      hosts = [ e[0] for e in expr['rows'] ]
+      lens = 28
+    match: len(hosts) < lens 
+    debug: lens, len(hosts), ",".join(hosts)
+
+
+  - task: http
+    name: oracle-perf-hostname 
+    path: http://172.27.1.41:7200/_sql
+    query: 
+      query: |
+        select hostname
+        from "oracle-perf*" 
+        where hostname is not null 
+        and "@timestamp" > now() - interval 10 minute 
+        group by hostname  
+    execute: |
+      hosts = [ e[0] for e in expr['rows'] ]
+      lens = 10
+    match: len(hosts) < lens 
+    debug: lens, len(hosts), ",".join(hosts)
+
+
+
+
+
+
