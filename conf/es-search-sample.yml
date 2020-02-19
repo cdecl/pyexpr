@@ -1,0 +1,14 @@
+
+tasks:
+  - task: http
+    name: es search sample
+    path: http://proto.inpark.kr:9200/infra-all/_search
+    query: 
+      size: 5
+      query:
+        query_string:
+          query: AIX
+    execute: |
+      hosts = [ e['_source']['호스트이름'] for e in expr['hits']['hits'] ]
+    match: len(hosts) == 0
+    debug: hosts
