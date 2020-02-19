@@ -4,6 +4,7 @@ import json
 import yaml
 import requests 
 import argparse
+import asyncio
 
 class Handler:
 	def __init__(self):
@@ -33,37 +34,45 @@ def match(find, s):
 	regex = re.compile(find)
 	return None != regex.match(s)
 
-def parse(f, args):
+async def parseOne(c, args, name, fnInvoke):
+	if args.verbose:
+		print('verbose {}'.format('-' * 80))
+		print(json.dumps(c, indent=2))
+	
+	(fire, debug) = fnInvoke(c["path"], c["query"], c["execute"], c["match"], c["debug"])
+	print('output {}'.format('-' * 80))
+	print('[name] : {}'.format(name))
+	print('[fire] : {}'.format(fire))
+	print('[debug] : {}'.format(debug))
+	print()
+	return (fire, debug) 
+
+async def parse(f, args):
 	conf = yaml.safe_load(f)
 	invoke = Handler()
-	ret = []
+	retval = []
+	wait = []
 
 	for c in conf['tasks']:
 		task = c['task']
 		if invoke.get(task) is None: continue
+		fnInvoke = invoke.get(task)
 
 		name = c['name']
 		if not match(args.name, name): continue
+		ft = asyncio.ensure_future(parseOne(c, args, name, fnInvoke))
+		wait.append(ft)
 
-		if args.verbose:
-			print('verbose {}'.format('-' * 80))
-			print(json.dumps(c, indent=2))
-		
-		(fire, debug) = invoke.get(task)(c["path"], c["query"], c["execute"], c["match"], c["debug"])
-		print('output {}'.format('-' * 80))
-		print('[name] : {}'.format(name))
-		print('[fire] : {}'.format(fire))
-		print('[debug] : {}'.format(debug))
-		print()
-
-		ret.append({'name': name, 'fire': fire, 'debug': debug})
-	return ret
+	asret = await asyncio.gather(*wait)	
+	for fire, debug in asret:
+		retval.append({'name': name, 'fire': fire, 'debug': debug})
+	return retval
 
 def run(args):
 	fname = args.file
 	ret = None
 	with open(fname, 'r', encoding='utf-8') as f:
-		ret = parse(f, args)
+		ret = asyncio.run(parse(f, args))
 	return ret
 
 def usage():
