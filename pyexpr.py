@@ -72,7 +72,10 @@ def run(args):
 	fname = args.file
 	ret = None
 	with open(fname, 'r', encoding='utf-8') as f:
-		ret = asyncio.run(parse(f, args))
+		#ret = asyncio.run(parse(f, args))
+		loop = asyncio.get_event_loop()
+		ret = loop.run_until_complete(parse(f, args))
+		loop.close()
 	return ret
 
 def usage():
