@@ -1,40 +1,57 @@
 
+import re
 import json
 import yaml
 import requests 
 import argparse
 
-def get_query(path, query, execute, match, debug):
-	url = path
-	payload = json.dumps(query)
-	headers = {'content-type': 'application/json'}
-	response = requests.get(url, data=payload, headers=headers) 
-	expr = response.json()
-	if not match: match = 'True'
-	if not debug: debug = 'expr'
-	if execute: exec(execute)
 
-	return (eval(match), eval(debug))
+class Handler:
+	def __init__(self):
+		self.funcs = {}
+		self.funcs['http'] = Handler.get_query
 
-handler = {}
-handler['http'] = get_query
+	def get(self, name):
+		fn = None
+		if name in self.funcs:
+			fn = self.funcs[name]
+		return fn
+
+	@staticmethod
+	def get_query(path, query, execute, match, debug):
+		url = path
+		payload = json.dumps(query)
+		headers = {'content-type': 'application/json'}
+		response = requests.get(url, data=payload, headers=headers) 
+		expr = response.json()
+		if not match: match = 'False'
+		if not debug: debug = 'expr'
+		if execute: exec(execute)
+		return (eval(match), eval(debug))
+
+
+def match(find, s):
+	regex = re.compile(find)
+	return None != regex.match(s)
 
 def parse(f, args):
 	conf = yaml.safe_load(f)
-	
+	invoke = Handler()
+
 	for c in conf['tasks']:
 		task = c['task']
-		if not task in handler: continue
+		if invoke.get(task) is None: continue
 
 		name = c['name']
-		if args.name and args.name != name: continue
+		if not match(args.name, name): continue
 
 		if args.verbose:
 			print('verbose {}'.format('-' * 80))
 			print(json.dumps(c, indent=4))
 		
-		(fire, debug) = handler[task](c["path"], c["query"], c["execute"], c["match"], c["debug"])
+		(fire, debug) = invoke.get(task)(c["path"], c["query"], c["execute"], c["match"], c["debug"])
 		print('output {}'.format('-' * 80))
+		print('[name] : {}'.format(name))
 		print('[fire] : {}'.format(fire))
 		print('[debug] : {}'.format(debug))
 		print()
@@ -50,8 +67,8 @@ def runYaml(args):
 def usage():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--verbose', '-v', help="verbose", action='store_true')
-	parser.add_argument('--file', '-f', help="yaml file ", type=str, default="tasks.yml")
-	parser.add_argument('--name', '-n', help="task name", type=str, default="")
+	parser.add_argument('--file', '-f', help="yaml file ", type=str, default="", required=True)
+	parser.add_argument('--name', '-n', help="task name (default: .*)", type=str, default=".*")
 	args = parser.parse_args()
 	return args
 
