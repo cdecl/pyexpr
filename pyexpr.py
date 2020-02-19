@@ -5,7 +5,6 @@ import yaml
 import requests 
 import argparse
 
-
 class Handler:
 	def __init__(self):
 		self.funcs = {}
@@ -37,6 +36,7 @@ def match(find, s):
 def parse(f, args):
 	conf = yaml.safe_load(f)
 	invoke = Handler()
+	ret = []
 
 	for c in conf['tasks']:
 		task = c['task']
@@ -47,7 +47,7 @@ def parse(f, args):
 
 		if args.verbose:
 			print('verbose {}'.format('-' * 80))
-			print(json.dumps(c, indent=4))
+			print(json.dumps(c, indent=2))
 		
 		(fire, debug) = invoke.get(task)(c["path"], c["query"], c["execute"], c["match"], c["debug"])
 		print('output {}'.format('-' * 80))
@@ -56,13 +56,15 @@ def parse(f, args):
 		print('[debug] : {}'.format(debug))
 		print()
 
-def runYaml(args):
+		ret.append({'name': name, 'fire': fire, 'debug': debug})
+	return ret
+
+def run(args):
 	fname = args.file
+	ret = None
 	with open(fname, 'r', encoding='utf-8') as f:
-		try:
-			parse(f, args)
-		except Exception as e:
-			print(e)
+		ret = parse(f, args)
+	return ret
 
 def usage():
 	parser = argparse.ArgumentParser()
@@ -74,7 +76,12 @@ def usage():
 
 def main():
 	args = usage()
-	runYaml(args)
+	try:
+		ret = run(args)
+		print('json {}'.format('-' * 80))
+		print(json.dumps(ret, indent=2))
+	except Exception as e:
+		print(e)
 
 if __name__ == "__main__":
 	main()
