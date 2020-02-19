@@ -4,8 +4,10 @@ import json
 from datetime import datetime
 from flask_api import FlaskAPI
 import pyexpr
+import asyncio
 
 app = FlaskAPI(__name__)
+loop = asyncio.get_event_loop()
 
 class Args:
 	verbose = True
@@ -26,7 +28,9 @@ def expr_execute(conf, name):
 	args = getArgs(conf, name)
 	ret = {}
 	try:
-		ret = pyexpr.run(args)
+		# ret = pyexpr.run(args)
+		ret = loop.run_until_complete(pyexpr.run(args))
+
 		ret = {'status': 200, 'data' : ret}
 	except Exception as e:
 		ret = {'status': 500, 'data' : e}
@@ -39,4 +43,4 @@ def index():
 
 if __name__ == '__main__':
 	# app.run(debug=True)
-	app.run()
+	app.run(host='0.0.0.0')

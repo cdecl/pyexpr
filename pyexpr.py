@@ -68,14 +68,11 @@ async def parse(f, args):
 		retval.append({'name': name, 'fire': fire, 'debug': debug})
 	return retval
 
-def run(args):
+async def run(args):
 	fname = args.file
 	ret = None
 	with open(fname, 'r', encoding='utf-8') as f:
-		#ret = asyncio.run(parse(f, args))
-		loop = asyncio.get_event_loop()
-		ret = loop.run_until_complete(parse(f, args))
-		loop.close()
+		ret = await parse(f, args)
 	return ret
 
 def usage():
@@ -89,7 +86,10 @@ def usage():
 def main():
 	args = usage()
 	try:
-		ret = run(args)
+		loop = asyncio.get_event_loop()
+		ret = loop.run_until_complete(run(args))
+		loop.close()
+
 		print('json {}'.format('-' * 80))
 		print(json.dumps(ret, indent=2))
 	except Exception as e:
