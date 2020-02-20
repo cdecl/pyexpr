@@ -1,0 +1,21 @@
+
+tasks:
+  - task: http
+    name: httpbin-get
+    path: http://httpbin.org/get
+    query: 
+    execute: |
+      user = expr['headers']['User-Agent']
+    match: ('requests' in user)
+    debug: expr
+
+  - task: http
+    name: httpbin-post
+    path: POST http://httpbin.org/post
+    query: 
+      data: 'httpbin-post'
+    execute: 
+      data = expr['json']['data']
+    match: data == 'httpbin-post'
+    debug: expr
+

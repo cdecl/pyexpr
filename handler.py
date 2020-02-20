@@ -16,10 +16,16 @@ class Handler:
 
 	@staticmethod
 	def get_query(path, query, execute, match, debug):
+		method = 'GET'
 		url = path
+		m = re.findall('([\w]{3,4})[ ]+(http.*)', path)
+		if len(m) > 0: 
+			method = m[0][0]
+			url = m[0][1]
+
 		payload = json.dumps(query)
 		headers = {'content-type': 'application/json'}
-		response = requests.get(url, data=payload, headers=headers) 
+		response = requests.request(method, url, data=payload, headers=headers) 
 		expr = response.json()
 		if not match: match = 'False'
 		if not debug: debug = 'expr'
