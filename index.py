@@ -30,7 +30,6 @@ def expr_execute(conf, name):
 	try:
 		# ret = pyexpr.run(args)
 		ret = loop.run_until_complete(pyexpr.run(args))
-
 		ret = {'status': 200, 'data' : ret}
 	except Exception as e:
 		ret = {'status': 500, 'data' : e}
