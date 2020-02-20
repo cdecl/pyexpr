@@ -6,7 +6,7 @@ import requests
 class Handler:
 	def __init__(self):
 		self.funcs = {}
-		self.funcs['http'] = Handler.get_query
+		self.funcs['http'] = Handler.http_handler
 
 	def get(self, name):
 		fn = None
@@ -15,7 +15,7 @@ class Handler:
 		return fn
 
 	@staticmethod
-	def get_query(path, query, execute, match, debug):
+	def http_handler(path, query, execute, match, debug):
 		method = 'GET'
 		url = path
 		m = re.findall('([\w]{3,4})[ ]+(http.*)', path)
