@@ -10,7 +10,7 @@ def match(find, s):
 	regex = re.compile(find)
 	return None != regex.match(s)
 
-async def parseOne(c, args, name, fnInvoke):
+def parseOne(c, args, name, fnInvoke):
 	if args.verbose:
 		print('verbose {}'.format('-' * 80))
 		print(json.dumps(c, indent=2))
@@ -29,6 +29,8 @@ async def parse(f, args):
 	retval = []
 	wait = []
 
+	loop = asyncio.get_event_loop()
+
 	for c in conf['tasks']:
 		task = c['task']
 		if invoke.get(task) is None: continue
@@ -36,7 +38,8 @@ async def parse(f, args):
 
 		name = c['name']
 		if not match(args.name, name): continue
-		ft = asyncio.ensure_future(parseOne(c, args, name, fnInvoke))
+
+		ft = loop.run_in_executor(None, parseOne, c, args, name, fnInvoke)
 		wait.append(ft)
 
 	asret = await asyncio.gather(*wait)	
