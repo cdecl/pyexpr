@@ -16,11 +16,14 @@ def parseOne(c, args, name, fnInvoke):
 		print(json.dumps(c, indent=2))
 	
 	(fire, debug) = fnInvoke(c["path"], c["query"], c["execute"], c["match"], c["debug"])
-	print('output {}'.format('-' * 80))
-	print('[name] : {}'.format(name))
-	print('[fire] : {}'.format(fire))
-	print('[debug] : {}'.format(debug))
-	print()
+
+	if not args.json:
+		print('output {}'.format('-' * 80))
+		print('[name] : {}'.format(name))
+		print('[fire] : {}'.format(fire))
+		print('[debug] : {}'.format(debug))
+		print()
+
 	return (name, fire, debug) 
 
 async def parse(f, args):
@@ -57,6 +60,7 @@ async def run(args):
 def usage():
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--verbose', '-v', help="verbose", action='store_true')
+	parser.add_argument('--json', '-j', help="print onley json output", action='store_true')
 	parser.add_argument('--file', '-f', help="yaml file ", type=str, default="", required=True)
 	parser.add_argument('--name', '-n', help="task name (default: .*)", type=str, default=".*")
 	args = parser.parse_args()
@@ -69,8 +73,10 @@ def main():
 		ret = loop.run_until_complete(run(args))
 		loop.close()
 
-		print('json {}'.format('-' * 80))
+		if not args.json:
+			print('json {}'.format('-' * 80))
 		print(json.dumps(ret, indent=2))
+		
 	except Exception as e:
 		print(e)
 
