@@ -21,7 +21,7 @@ def parseOne(c, args, name, fnInvoke):
 	print('[fire] : {}'.format(fire))
 	print('[debug] : {}'.format(debug))
 	print()
-	return (fire, debug) 
+	return (name, fire, debug) 
 
 async def parse(f, args):
 	conf = yaml.safe_load(f)
@@ -43,7 +43,7 @@ async def parse(f, args):
 		wait.append(ft)
 
 	asret = await asyncio.gather(*wait)	
-	for fire, debug in asret:
+	for naem, fire, debug in asret:
 		retval.append({'name': name, 'fire': fire, 'debug': debug})
 	return retval
 
