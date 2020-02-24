@@ -46,7 +46,7 @@ async def parse(f, args):
 		wait.append(ft)
 
 	asret = await asyncio.gather(*wait)	
-	for naem, fire, debug in asret:
+	for name, fire, debug in asret:
 		retval.append({'name': name, 'fire': fire, 'debug': debug})
 	return retval
 
@@ -76,7 +76,7 @@ def main():
 		if not args.json:
 			print('json {}'.format('-' * 80))
 		print(json.dumps(ret, indent=2))
-		
+
 	except Exception as e:
 		print(e)
 

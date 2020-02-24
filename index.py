@@ -11,6 +11,7 @@ loop = asyncio.get_event_loop()
 
 class Args:
 	verbose = True
+	json = True
 	file = ''
 	name = ''
 
